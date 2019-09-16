@@ -203,23 +203,24 @@ class Interface:
         if not mac:
             return None
 
-        # a mac address consits out of 6 octets
-        octets = len(mac.split(':'))
-        if octets != 6:
-            raise ValueError('wrong number of MAC octets: {} '.format(octets))
+        mac_lst = mac.upper().split(':')
 
+        # a mac address consits out of 6 octets
+        if len(mac_lst) != 6:
+            raise ValueError('wrong number of MAC octets: {} '.format(len(mac_lst)))
+
+        # check for VRRP mac address
+        if mac_lst[0] == '00' and mac_lst[1] == '00' and mac_lst[2] == '5E' and mac_lst[3] == '00' and mac_lst[4] == '01':
+            raise ValueError('{} is a VRRP MAC address'.format(mac))
+        
         # validate against the first mac address byte if it's a multicast
         # address
-        if int(mac.split(':')[0]) & 1:
+        if mac_lst[0] =='01':
             raise ValueError('{} is a multicast MAC address'.format(mac))
 
         # overall mac address is not allowed to be 00:00:00:00:00:00
-        if sum(int(i, 16) for i in mac.split(':')) == 0:
+        if mac == '00:00:00:00:00:00':
             raise ValueError('00:00:00:00:00:00 is not a valid MAC address')
-
-        # check for VRRP mac address
-        if mac.split(':')[0] == '0' and addr.split(':')[1] == '0' and mac.split(':')[2] == '94' and mac.split(':')[3] == '0' and mac.split(':')[4] == '1':
-            raise ValueError('{} is a VRRP MAC address'.format(mac))
 
         # Assemble command executed on system. Unfortunately there is no way
         # of altering the MAC address via sysfs
