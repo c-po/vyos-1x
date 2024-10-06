@@ -54,6 +54,9 @@ class TestProtocolsOSPFv3(VyOSUnitTestSHIM.TestCase):
         self.cli_delete(base_path)
         self.cli_commit()
 
+        frrconfig = self.getFRRconfig('router ospf6')
+        self.assertNotIn(f'router ospf6', frrconfig)
+
         # check process health and continuity
         self.assertEqual(self.daemon_pid, process_named_running(PROCESS_NAME))
 

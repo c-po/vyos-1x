@@ -66,6 +66,9 @@ class TestProtocolsRIP(VyOSUnitTestSHIM.TestCase):
         self.cli_delete(base_path)
         self.cli_commit()
 
+        frrconfig = self.getFRRconfig('router rip')
+        self.assertNotIn(f'router rip', frrconfig)
+
         # check process health and continuity
         self.assertEqual(self.daemon_pid, process_named_running(PROCESS_NAME))
 
