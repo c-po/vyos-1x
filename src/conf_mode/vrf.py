@@ -158,6 +158,7 @@ def verify(vrf):
         reserved_names = ["add", "all", "broadcast", "default", "delete", "dev",
                           "get", "inet", "mtu", "link", "type", "vrf"]
         table_ids = []
+        vnis = []
         for name, vrf_config in vrf['name'].items():
             # Reserved VRF names
             if name in reserved_names:
@@ -177,6 +178,13 @@ def verify(vrf):
             if 'table' in vrf_config and vrf_config['table'] in table_ids:
                 raise ConfigError(f'VRF "{name}" table id is not unique!')
             table_ids.append(vrf_config['table'])
+
+            # VRF VNIs must be unique on the system
+            if 'vni' in vrf_config:
+                vni = vrf_config['vni']
+                if vni in vnis:
+                    raise ConfigError(f'VRF "{name}" VNI "{vni}" is not unique!')
+                vnis.append(vni)
 
             tmp = dict_search('ip.protocol', vrf_config)
             if tmp != None:
