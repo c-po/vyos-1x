@@ -117,6 +117,9 @@ class TestProtocolsRPKI(VyOSUnitTestSHIM.TestCase):
         self.cli_delete(base_path)
         self.cli_commit()
 
+        frrconfig = self.getFRRconfig('rpki')
+        self.assertNotIn(f'rpki', frrconfig)
+
         # check process health and continuity
         self.assertEqual(self.daemon_pid, process_named_running(PROCESS_NAME))
 
@@ -159,7 +162,7 @@ class TestProtocolsRPKI(VyOSUnitTestSHIM.TestCase):
         for peer, peer_config in cache.items():
             port = peer_config['port']
             preference = peer_config['preference']
-            self.assertIn(f'rpki cache {peer} {port} preference {preference}', frrconfig)
+            self.assertIn(f'rpki cache tcp {peer} {port} preference {preference}', frrconfig)
 
     def test_rpki_ssh(self):
         polling = '7200'
@@ -195,7 +198,7 @@ class TestProtocolsRPKI(VyOSUnitTestSHIM.TestCase):
             port = cache_config['port']
             preference = cache_config['preference']
             username = cache_config['username']
-            self.assertIn(f'rpki cache {cache_name} {port} {username} /run/frr/id_rpki_{cache_name} /run/frr/id_rpki_{cache_name}.pub preference {preference}', frrconfig)
+            self.assertIn(f'rpki cache ssh {cache_name} {port} {username} /run/frr/id_rpki_{cache_name} /run/frr/id_rpki_{cache_name}.pub preference {preference}', frrconfig)
 
             # Verify content of SSH keys
             tmp = read_file(f'/run/frr/id_rpki_{cache_name}')
@@ -213,7 +216,7 @@ class TestProtocolsRPKI(VyOSUnitTestSHIM.TestCase):
             port = cache_config['port']
             preference = cache_config['preference']
             username = cache_config['username']
-            self.assertIn(f'rpki cache {cache_name} {port} {username} /run/frr/id_rpki_{cache_name} /run/frr/id_rpki_{cache_name}.pub preference {preference}', frrconfig)
+            self.assertIn(f'rpki cache ssh {cache_name} {port} {username} /run/frr/id_rpki_{cache_name} /run/frr/id_rpki_{cache_name}.pub preference {preference}', frrconfig)
 
             # Verify content of SSH keys
             tmp = read_file(f'/run/frr/id_rpki_{cache_name}')
