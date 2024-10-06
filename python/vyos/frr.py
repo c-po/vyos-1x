@@ -86,8 +86,25 @@ ch2 = logging.StreamHandler(stream=sys.stdout)
 LOG.addHandler(ch)
 LOG.addHandler(ch2)
 
-_frr_daemons = ['zebra', 'staticd', 'bgpd', 'ospfd', 'ospf6d', 'ripd', 'ripngd',
-                'isisd', 'pimd', 'pim6d', 'ldpd', 'eigrpd', 'babeld', 'bfdd', 'fabricd']
+babel_daemon = 'babeld'
+bfd_daemon = 'bfdd'
+bgp_daemon = 'bgpd'
+eigrp_daemon = 'eigrpd'
+isis_daemon = 'isisd'
+ldpd_daemon = 'ldpd'
+mgmt_daemon = 'mgmtd'
+openfabric_daemon = 'fabricd'
+ospf_daemon = 'ospfd'
+ospf6_daemon = 'ospf6d'
+pim_daemon = 'pimd'
+pim6_daemon = 'pim6d'
+rip_daemon = 'ripd'
+ripng_daemon = 'ripngd'
+static_daemon = 'staticd'
+zebra_daemon = 'zebra'
+
+_frr_daemons = [zebra_daemon, static_daemon, bgp_daemon, ospf_daemon, ospf6_daemon, rip_daemon, ripng_daemon, mgmt_daemon,
+                isis_daemon, pim_daemon, pim6_daemon, ldpd_daemon, eigrp_daemon, babel_daemon, bfd_daemon, openfabric_daemon]
 
 path_vtysh = '/usr/bin/vtysh'
 path_frr_reload = '/usr/lib/frr/frr-reload.py'

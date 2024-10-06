@@ -101,18 +101,12 @@ def generate(rip):
     return None
 
 def apply(rip):
-    rip_daemon = 'ripd'
-    zebra_daemon = 'zebra'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
-    # The route-map used for the FIB (zebra) is part of the zebra daemon
-    frr_cfg.load_configuration(zebra_daemon)
+    # The route-map used for the FIB (zebra) is part of the mgmt daemon as of FRR 10.1
+    frr_cfg.load_configuration(frr.mgmt_daemon)
     frr_cfg.modify_section('^ip protocol rip route-map [-a-zA-Z0-9.]+', stop_pattern='(\s|!)')
-    frr_cfg.commit_configuration(zebra_daemon)
-
-    frr_cfg.load_configuration(rip_daemon)
     frr_cfg.modify_section('^key chain \S+', stop_pattern='^exit', remove_stop_mark=True)
     frr_cfg.modify_section('^router rip', stop_pattern='^exit', remove_stop_mark=True)
 
@@ -124,7 +118,7 @@ def apply(rip):
 
     if 'new_frr_config' in rip:
         frr_cfg.add_before(frr.default_add_before, rip['new_frr_config'])
-    frr_cfg.commit_configuration(rip_daemon)
+    frr_cfg.commit_configuration()
 
     return None
 

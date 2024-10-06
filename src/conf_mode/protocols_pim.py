@@ -131,8 +131,7 @@ def generate(pim):
     return None
 
 def apply(pim):
-    pim_daemon = 'pimd'
-    pim_pid = process_named_running(pim_daemon)
+    pim_pid = process_named_running(frr.pim_daemon)
 
     if not pim or 'deleted' in pim:
         if 'deleted' in pim:
@@ -146,7 +145,7 @@ def apply(pim):
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
-    frr_cfg.load_configuration(pim_daemon)
+    frr_cfg.load_configuration(frr.pim_daemon)
     frr_cfg.modify_section(f'^ip pim')
     frr_cfg.modify_section(f'^ip igmp')
 
@@ -158,7 +157,7 @@ def apply(pim):
 
     if 'frr_pimd_config' in pim:
         frr_cfg.add_before(frr.default_add_before, pim['frr_pimd_config'])
-    frr_cfg.commit_configuration(pim_daemon)
+    frr_cfg.commit_configuration(frr.pim_daemon)
     return None
 
 if __name__ == '__main__':

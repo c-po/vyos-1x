@@ -107,16 +107,14 @@ def generate(rpki):
     return None
 
 def apply(rpki):
-    bgp_daemon = 'bgpd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-    frr_cfg.load_configuration(bgp_daemon)
+    frr_cfg.load_configuration(frr.bgp_daemon)
     frr_cfg.modify_section('^rpki', stop_pattern='^exit', remove_stop_mark=True)
     if 'new_frr_config' in rpki:
         frr_cfg.add_before(frr.default_add_before, rpki['new_frr_config'])
 
-    frr_cfg.commit_configuration(bgp_daemon)
+    frr_cfg.commit_configuration(frr.bgp_daemon)
     return None
 
 if __name__ == '__main__':

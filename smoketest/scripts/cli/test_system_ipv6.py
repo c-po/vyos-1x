@@ -20,6 +20,7 @@ from base_vyostest_shim import VyOSUnitTestSHIM
 
 from vyos.configsession import ConfigSessionError
 from vyos.utils.file import read_file
+from vyos.frr import mgmt_daemon
 
 base_path = ['system', 'ipv6']
 
@@ -99,7 +100,7 @@ class TestSystemIPv6(VyOSUnitTestSHIM.TestCase):
         self.cli_commit()
 
         # Verify route-map properly applied to FRR
-        frrconfig = self.getFRRconfig('ipv6 protocol', end='', daemon='zebra')
+        frrconfig = self.getFRRconfig('ipv6 protocol', end='', daemon=mgmt_daemon)
         for protocol in protocols:
             # VyOS and FRR use a different name for OSPFv3 (IPv6)
             if protocol == 'ospfv3':
@@ -113,7 +114,7 @@ class TestSystemIPv6(VyOSUnitTestSHIM.TestCase):
         self.cli_commit()
 
         # Verify route-map properly applied to FRR
-        frrconfig = self.getFRRconfig('ipv6 protocol', end='', daemon='zebra')
+        frrconfig = self.getFRRconfig('ipv6 protocol', end='', daemon=mgmt_daemon)
         self.assertNotIn(f'ipv6 protocol', frrconfig)
 
     def test_system_ipv6_protocol_non_existing_route_map(self):
@@ -132,13 +133,13 @@ class TestSystemIPv6(VyOSUnitTestSHIM.TestCase):
         self.cli_set(base_path + ['nht', 'no-resolve-via-default'])
         self.cli_commit()
         # Verify CLI config applied to FRR
-        frrconfig = self.getFRRconfig('', end='', daemon='zebra')
+        frrconfig = self.getFRRconfig('', end='', daemon=mgmt_daemon)
         self.assertIn(f'no ipv6 nht resolve-via-default', frrconfig)
 
         self.cli_delete(base_path + ['nht', 'no-resolve-via-default'])
         self.cli_commit()
         # Verify CLI config removed to FRR
-        frrconfig = self.getFRRconfig('', end='', daemon='zebra')
+        frrconfig = self.getFRRconfig('', end='', daemon=mgmt_daemon)
         self.assertNotIn(f'no ipv6 nht resolve-via-default', frrconfig)
 
 if __name__ == '__main__':

@@ -274,8 +274,6 @@ def generate(isis):
     return None
 
 def apply(isis):
-    isis_daemon = 'isisd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
@@ -285,7 +283,7 @@ def apply(isis):
     if 'vrf' in isis:
         vrf = ' vrf ' + isis['vrf']
 
-    frr_cfg.load_configuration(isis_daemon)
+    frr_cfg.load_configuration(frr.isis_daemon)
     frr_cfg.modify_section(f'^router isis VyOS{vrf}', stop_pattern='^exit', remove_stop_mark=True)
 
     for key in ['interface', 'interface_removed']:
@@ -297,7 +295,7 @@ def apply(isis):
     if 'frr_isisd_config' in isis:
         frr_cfg.add_before(frr.default_add_before, isis['frr_isisd_config'])
 
-    frr_cfg.commit_configuration(isis_daemon)
+    frr_cfg.commit_configuration(frr.isis_daemon)
 
     return None
 

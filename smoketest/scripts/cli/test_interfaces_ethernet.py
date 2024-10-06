@@ -27,6 +27,7 @@ from netifaces import ifaddresses
 from base_interfaces_test import BasicInterfaceTest
 from vyos.configsession import ConfigSessionError
 from vyos.ifconfig import Section
+from vyos.frr import mgmt_daemon
 from vyos.utils.process import cmd
 from vyos.utils.process import popen
 from vyos.utils.file import read_file
@@ -219,7 +220,7 @@ class EthernetInterfaceTest(BasicInterfaceTest.TestCase):
         self.cli_commit()
 
         for interface in self._interfaces:
-            frrconfig = self.getFRRconfig(f'interface {interface}', daemon='zebra')
+            frrconfig = self.getFRRconfig(f'interface {interface}', daemon=mgmt_daemon)
             self.assertIn(f' evpn mh uplink', frrconfig)
 
 if __name__ == '__main__':

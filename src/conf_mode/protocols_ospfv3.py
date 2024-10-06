@@ -153,8 +153,6 @@ def generate(ospfv3):
     return None
 
 def apply(ospfv3):
-    ospf6_daemon = 'ospf6d'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
@@ -164,7 +162,7 @@ def apply(ospfv3):
     if 'vrf' in ospfv3:
         vrf = ' vrf ' + ospfv3['vrf']
 
-    frr_cfg.load_configuration(ospf6_daemon)
+    frr_cfg.load_configuration(frr.ospf6_daemon)
     frr_cfg.modify_section(f'^router ospf6{vrf}', stop_pattern='^exit', remove_stop_mark=True)
 
     for key in ['interface', 'interface_removed']:
@@ -176,7 +174,7 @@ def apply(ospfv3):
     if 'new_frr_config' in ospfv3:
         frr_cfg.add_before(frr.default_add_before, ospfv3['new_frr_config'])
 
-    frr_cfg.commit_configuration(ospf6_daemon)
+    frr_cfg.commit_configuration(frr.ospf6_daemon)
 
     return None
 

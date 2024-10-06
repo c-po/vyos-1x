@@ -617,8 +617,6 @@ def apply(bgp):
         if {'vrf', 'vni'} <= set(bgp):
             call('vtysh -c "conf t" -c "vrf {vrf}" -c "no vni {vni}"'.format(**bgp))
 
-    bgp_daemon = 'bgpd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
@@ -628,7 +626,7 @@ def apply(bgp):
     if 'vrf' in bgp:
         vrf = ' vrf ' + bgp['vrf']
 
-    frr_cfg.load_configuration(bgp_daemon)
+    frr_cfg.load_configuration(frr.bgp_daemon)
 
     # Remove interface specific config
     for key in ['interface', 'interface_removed']:
@@ -640,7 +638,7 @@ def apply(bgp):
     frr_cfg.modify_section(f'^router bgp \d+{vrf}', stop_pattern='^exit', remove_stop_mark=True)
     if 'frr_bgpd_config' in bgp:
         frr_cfg.add_before(frr.default_add_before, bgp['frr_bgpd_config'])
-    frr_cfg.commit_configuration(bgp_daemon)
+    frr_cfg.commit_configuration(frr.bgp_daemon)
 
     return None
 

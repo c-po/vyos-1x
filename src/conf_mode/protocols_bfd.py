@@ -89,15 +89,13 @@ def generate(bfd):
     bfd['new_frr_config'] = render_to_string('frr/bfdd.frr.j2', bfd)
 
 def apply(bfd):
-    bfd_daemon = 'bfdd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-    frr_cfg.load_configuration(bfd_daemon)
+    frr_cfg.load_configuration(frr.bfd_daemon)
     frr_cfg.modify_section('^bfd', stop_pattern='^exit', remove_stop_mark=True)
     if 'new_frr_config' in bfd:
         frr_cfg.add_before(frr.default_add_before, bfd['new_frr_config'])
-    frr_cfg.commit_configuration(bfd_daemon)
+    frr_cfg.commit_configuration(frr.bfd_daemon)
 
     return None
 

@@ -339,17 +339,13 @@ def apply(vrf):
             if has_rule(afi, 2000, 'l3mdev'):
                 call(f'ip {afi} rule del pref 2000 l3mdev unreachable')
 
-    # Apply FRR filters
-    zebra_daemon = 'zebra'
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-
-    # The route-map used for the FIB (zebra) is part of the zebra daemon
-    frr_cfg.load_configuration(zebra_daemon)
+    frr_cfg.load_configuration(frr.mgmt_daemon)
     frr_cfg.modify_section(f'^vrf .+', stop_pattern='^exit-vrf', remove_stop_mark=True)
     if 'frr_zebra_config' in vrf:
         frr_cfg.add_before(frr.default_add_before, vrf['frr_zebra_config'])
-    frr_cfg.commit_configuration(zebra_daemon)
+    frr_cfg.commit_configuration()
 
     return None
 

@@ -337,16 +337,13 @@ def apply(ethernet):
     else:
         e.update(ethernet)
 
-    zebra_daemon = 'zebra'
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-
-    # The route-map used for the FIB (zebra) is part of the zebra daemon
-    frr_cfg.load_configuration(zebra_daemon)
+    frr_cfg.load_configuration(frr.mgmt_daemon)
     frr_cfg.modify_section(f'^interface {ifname}', stop_pattern='^exit', remove_stop_mark=True)
     if 'frr_zebra_config' in ethernet:
         frr_cfg.add_before(frr.default_add_before, ethernet['frr_zebra_config'])
-    frr_cfg.commit_configuration(zebra_daemon)
+    frr_cfg.commit_configuration()
 
 if __name__ == '__main__':
     try:

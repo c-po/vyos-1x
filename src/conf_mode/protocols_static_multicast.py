@@ -103,10 +103,9 @@ def generate(mroute):
 def apply(mroute):
     if mroute is None:
         return None
-    static_daemon = 'staticd'
 
     frr_cfg = frr.FRRConfig()
-    frr_cfg.load_configuration(static_daemon)
+    frr_cfg.load_configuration(frr.mgmt_daemon)
 
     if 'old_mroute' in mroute:
         for route_gr in mroute['old_mroute']:
@@ -119,8 +118,7 @@ def apply(mroute):
     if 'new_frr_config' in mroute:
         frr_cfg.add_before(frr.default_add_before, mroute['new_frr_config'])
 
-    frr_cfg.commit_configuration(static_daemon)
-
+    frr_cfg.commit_configuration()
     return None
 
 

@@ -85,31 +85,22 @@ def verify(ripng):
 
 def generate(ripng):
     if not ripng:
-        ripng['new_frr_config'] = ''
         return None
-
     ripng['new_frr_config'] = render_to_string('frr/ripngd.frr.j2', ripng)
-    return None
 
 def apply(ripng):
-    ripng_daemon = 'ripngd'
-    zebra_daemon = 'zebra'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
     # The route-map used for the FIB (zebra) is part of the zebra daemon
-    frr_cfg.load_configuration(zebra_daemon)
+    frr_cfg.load_configuration(frr.mgmt_daemon)
     frr_cfg.modify_section('^ipv6 protocol ripng route-map [-a-zA-Z0-9.]+', stop_pattern='(\s|!)')
-    frr_cfg.commit_configuration(zebra_daemon)
-
-    frr_cfg.load_configuration(ripng_daemon)
     frr_cfg.modify_section('key chain \S+', stop_pattern='^exit', remove_stop_mark=True)
     frr_cfg.modify_section('interface \S+', stop_pattern='^exit', remove_stop_mark=True)
     frr_cfg.modify_section('^router ripng', stop_pattern='^exit', remove_stop_mark=True)
     if 'new_frr_config' in ripng:
         frr_cfg.add_before(frr.default_add_before, ripng['new_frr_config'])
-    frr_cfg.commit_configuration(ripng_daemon)
+    frr_cfg.commit_configuration()
 
     return None
 

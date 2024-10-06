@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (C) 2022 VyOS maintainers and contributors
+# Copyright (C) 2022-2024 VyOS maintainers and contributors
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 or later as
@@ -89,8 +89,6 @@ def generate(eigrp):
     eigrp['frr_eigrpd_config']  = render_to_string('frr/eigrpd.frr.j2', eigrp)
 
 def apply(eigrp):
-    eigrp_daemon = 'eigrpd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
@@ -100,11 +98,11 @@ def apply(eigrp):
     if 'vrf' in eigrp:
         vrf = ' vrf ' + eigrp['vrf']
 
-    frr_cfg.load_configuration(eigrp_daemon)
+    frr_cfg.load_configuration(frr.eigrp_daemon)
     frr_cfg.modify_section(f'^router eigrp \d+{vrf}', stop_pattern='^exit', remove_stop_mark=True)
     if 'frr_eigrpd_config' in eigrp:
         frr_cfg.add_before(frr.default_add_before, eigrp['frr_eigrpd_config'])
-    frr_cfg.commit_configuration(eigrp_daemon)
+    frr_cfg.commit_configuration(frr.eigrp_daemon)
 
     return None
 

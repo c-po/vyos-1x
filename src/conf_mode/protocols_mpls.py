@@ -77,17 +77,15 @@ def generate(mpls):
     return None
 
 def apply(mpls):
-    ldpd_damon = 'ldpd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
-    frr_cfg.load_configuration(ldpd_damon)
+    frr_cfg.load_configuration(frr.ldpd_daemon)
     frr_cfg.modify_section(f'^mpls ldp', stop_pattern='^exit', remove_stop_mark=True)
 
     if 'frr_ldpd_config' in mpls:
         frr_cfg.add_before(frr.default_add_before, mpls['frr_ldpd_config'])
-    frr_cfg.commit_configuration(ldpd_damon)
+    frr_cfg.commit_configuration(frr.ldpd_daemon)
 
     # Set number of entries in the platform label tables
     labels = '0'

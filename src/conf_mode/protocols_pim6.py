@@ -104,12 +104,9 @@ def apply(pim6):
     if pim6 is None:
         return
 
-    pim6_daemon = 'pim6d'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-
-    frr_cfg.load_configuration(pim6_daemon)
+    frr_cfg.load_configuration(frr.pim6_daemon)
 
     for key in ['interface', 'interface_removed']:
         if key not in pim6:
@@ -119,7 +116,7 @@ def apply(pim6):
 
     if 'new_frr_config' in pim6:
         frr_cfg.add_before(frr.default_add_before, pim6['new_frr_config'])
-    frr_cfg.commit_configuration(pim6_daemon)
+    frr_cfg.commit_configuration(frr.pim6_daemon)
     return None
 
 if __name__ == '__main__':

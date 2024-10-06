@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (C) 2021-2023 VyOS maintainers and contributors
+# Copyright (C) 2021-2024 VyOS maintainers and contributors
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 or later as
@@ -25,6 +25,7 @@ from vyos.configsession import ConfigSessionError
 from vyos.template import is_ipv6
 from vyos.utils.process import process_named_running
 from vyos.utils.process import cmd
+from vyos.frr import bgp_daemon
 
 PROCESS_NAME = 'bgpd'
 ASN = '64512'
@@ -960,7 +961,7 @@ class TestProtocolsBGP(VyOSUnitTestSHIM.TestCase):
         self.assertIn(f'router bgp {ASN}', frrconfig)
 
         for afi in ['ipv4', 'ipv6']:
-            afi_config = self.getFRRconfig(f' address-family {afi} unicast', endsection='exit-address-family', daemon='bgpd')
+            afi_config = self.getFRRconfig(f' address-family {afi} unicast', endsection='exit-address-family', daemon=bgp_daemon)
             self.assertIn(f'address-family {afi} unicast', afi_config)
             self.assertIn(f'  export vpn', afi_config)
             self.assertIn(f'  import vpn', afi_config)

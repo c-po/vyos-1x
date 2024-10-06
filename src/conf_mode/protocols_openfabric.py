@@ -115,12 +115,10 @@ def generate(openfabric):
     return None
 
 def apply(openfabric):
-    openfabric_daemon = 'fabricd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
-    frr_cfg.load_configuration(openfabric_daemon)
+    frr_cfg.load_configuration(frr.openfabric_daemon)
     for domain in openfabric['domains_all']:
         frr_cfg.modify_section(f'^router openfabric {domain}', stop_pattern='^exit', remove_stop_mark=True)
 
@@ -130,7 +128,7 @@ def apply(openfabric):
     if 'frr_fabricd_config' in openfabric:
         frr_cfg.add_before(frr.default_add_before, openfabric['frr_fabricd_config'])
 
-    frr_cfg.commit_configuration(openfabric_daemon)
+    frr_cfg.commit_configuration(frr.openfabric_daemon)
 
     return None
 

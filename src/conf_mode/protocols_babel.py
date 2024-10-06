@@ -128,12 +128,10 @@ def generate(babel):
     return None
 
 def apply(babel):
-    babel_daemon = 'babeld'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
 
-    frr_cfg.load_configuration(babel_daemon)
+    frr_cfg.load_configuration(frr.babel_daemon)
     frr_cfg.modify_section('^router babel', stop_pattern='^exit', remove_stop_mark=True)
 
     for key in ['interface', 'interface_removed']:
@@ -144,7 +142,7 @@ def apply(babel):
 
     if 'new_frr_config' in babel:
         frr_cfg.add_before(frr.default_add_before, babel['new_frr_config'])
-    frr_cfg.commit_configuration(babel_daemon)
+    frr_cfg.commit_configuration(frr.babel_daemon)
 
     return None
 

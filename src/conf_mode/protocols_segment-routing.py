@@ -70,8 +70,6 @@ def generate(sr):
     return None
 
 def apply(sr):
-    zebra_daemon = 'zebra'
-
     if 'interface_removed' in sr:
         for interface in sr['interface_removed']:
             # Disable processing of IPv6-SR packets
@@ -97,11 +95,11 @@ def apply(sr):
 
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-    frr_cfg.load_configuration(zebra_daemon)
+    frr_cfg.load_configuration(frr.zebra_daemon)
     frr_cfg.modify_section(r'^segment-routing')
     if 'new_frr_config' in sr:
         frr_cfg.add_before(frr.default_add_before, sr['new_frr_config'])
-    frr_cfg.commit_configuration(zebra_daemon)
+    frr_cfg.commit_configuration(frr.zebra_daemon)
 
     return None
 

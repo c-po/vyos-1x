@@ -102,11 +102,9 @@ def generate(static):
     return None
 
 def apply(static):
-    static_daemon = 'staticd'
-
     # Save original configuration prior to starting any commit actions
     frr_cfg = frr.FRRConfig()
-    frr_cfg.load_configuration(static_daemon)
+    frr_cfg.load_configuration(frr.mgmt_daemon)
 
     if 'vrf' in static:
         vrf = static['vrf']
@@ -117,7 +115,7 @@ def apply(static):
 
     if 'new_frr_config' in static:
         frr_cfg.add_before(frr.default_add_before, static['new_frr_config'])
-    frr_cfg.commit_configuration(static_daemon)
+    frr_cfg.commit_configuration()
 
     return None
 

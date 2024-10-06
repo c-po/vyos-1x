@@ -34,6 +34,7 @@ from vyos.utils.process import call
 from vyos.utils.permission import chmod_755
 from vyos.version import get_version_data
 from vyos import ConfigError
+from vyos import frr
 from vyos import airbag
 airbag.enable()
 
@@ -265,7 +266,8 @@ def apply(snmp):
     # This should be done for each daemon individually because common command
     # works only if all the daemons started with SNMP support
     # Following daemons from FRR 9.0/stable have SNMP module compiled in VyOS
-    frr_daemons_list = ['zebra', 'bgpd', 'ospf6d', 'ospfd', 'ripd', 'isisd', 'ldpd']
+    frr_daemons_list = [frr.zebra_daemon, frr.bgp_daemon, frr.ospf_daemon, frr.ospf6_daemon,
+                        frr.rip_daemon, frr.isis_daemon, frr.ldpd_daemon]
     for frr_daemon in frr_daemons_list:
         call(f'vtysh -c "configure terminal" -d {frr_daemon} -c "agentx" >/dev/null')
 

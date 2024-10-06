@@ -20,6 +20,7 @@ from base_vyostest_shim import VyOSUnitTestSHIM
 
 from vyos.configsession import ConfigSessionError
 from vyos.ifconfig import Section
+from vyos.frr import zebra_daemon
 from vyos.utils.process import process_named_running
 from vyos.utils.system import sysctl_read
 
@@ -68,7 +69,7 @@ class TestProtocolsSegmentRouting(VyOSUnitTestSHIM.TestCase):
             self.assertEqual(sysctl_read(f'net.ipv6.conf.{interface}.seg6_enabled'), '1')
             self.assertEqual(sysctl_read(f'net.ipv6.conf.{interface}.seg6_require_hmac'), '0') # default
 
-        frrconfig = self.getFRRconfig(f'segment-routing', daemon='zebra')
+        frrconfig = self.getFRRconfig(f'segment-routing', daemon=zebra_daemon)
         self.assertIn(f'segment-routing', frrconfig)
         self.assertIn(f' srv6', frrconfig)
         self.assertIn(f'  locators', frrconfig)
