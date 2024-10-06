@@ -166,7 +166,7 @@ Depends:
   sstp-client,
 # End "interfaces sstpc"
 # For "protocols *"
-  frr (>= 9.1),
+  frr (>= 10.1),
   frr-pythontools,
   frr-rpki-rtrlib,
   frr-snmp,
