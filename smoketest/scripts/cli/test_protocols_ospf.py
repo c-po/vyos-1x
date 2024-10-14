@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-import time
 
+from time import sleep
 from base_vyostest_shim import VyOSUnitTestSHIM
 
 from vyos.configsession import ConfigSessionError
@@ -226,6 +226,13 @@ class TestProtocolsOSPF(VyOSUnitTestSHIM.TestCase):
         frrconfig = self.getFRRconfig('router ospf', daemon=PROCESS_NAME)
         self.assertIn(f' distance ospf intra-area {intra_area} inter-area {inter_area} external {external}', frrconfig)
 
+        # https://github.com/FRRouting/frr/issues/17011
+        # We need to wait on_shutdown time, until the OSPF process is removed from the CLI
+        # otherwise the test in tearDown() will fail
+        self.cli_delete(base_path)
+        self.cli_commit()
+
+        sleep(int(on_shutdown) + 5) # additional grace period of 5 seconds
 
     def test_ospf_06_neighbor(self):
         priority = '10'
@@ -572,7 +579,7 @@ class TestProtocolsOSPF(VyOSUnitTestSHIM.TestCase):
                 print(f"Attempt {retry_count}: FRR config is still empty. Retrying...")
 
             retry_count += 1
-            time.sleep(1)
+            sleep(1)
             frrconfig = self.getFRRconfig('router ospf', daemon=PROCESS_NAME)
 
         if not frrconfig:
