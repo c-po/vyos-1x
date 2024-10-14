@@ -664,3 +664,70 @@ def get_accel_dict(config, base, chap_secrets, with_pki=False):
             dict['authentication']['radius']['server'][server]['acct_port'] = '0'
 
     return dict
+
+def get_frrender_dict(conf) -> dict:
+    from vyos.config import config_dict_merge
+
+    # We will always need the policy key
+    dict = conf.get_config_dict(['policy'], key_mangling=('-', '_'), no_tag_node_value_mangle=True)
+
+    ospf_path = ['protocols', 'ospf']
+    if conf.exists(ospf_path):
+        ospf = conf.get_config_dict(['protocols', 'ospf'], key_mangling=('-', '_'), get_first_key=True)
+        # We have gathered the dict representation of the CLI, but there are default
+        # options which we need to update into the dictionary retrived.
+        default_values = conf.get_config_defaults(**ospf.kwargs, recursive=True)
+
+        # We have to cleanup the default dict, as default values could enable features
+        # which are not explicitly enabled on the CLI. Example: default-information
+        # originate comes with a default metric-type of 2, which will enable the
+        # entire default-information originate tree, even when not set via CLI so we
+        # need to check this first and probably drop that key.
+        if dict_search('default_information.originate', ospf) is None:
+            del default_values['default_information']
+        if 'mpls_te' not in ospf:
+            del default_values['mpls_te']
+        if 'graceful_restart' not in ospf:
+            del default_values['graceful_restart']
+        for area_num in default_values.get('area', []):
+            if dict_search(f'area.{area_num}.area_type.nssa', ospf) is None:
+                del default_values['area'][area_num]['area_type']['nssa']
+
+        for protocol in ['babel', 'bgp', 'connected', 'isis', 'kernel', 'rip', 'static']:
+            if dict_search(f'redistribute.{protocol}', ospf) is None:
+                del default_values['redistribute'][protocol]
+        if not bool(default_values['redistribute']):
+            del default_values['redistribute']
+
+        for interface in ospf.get('interface', []):
+            # We need to reload the defaults on every pass b/c of
+            # hello-multiplier dependency on dead-interval
+            # If hello-multiplier is set, we need to remove the default from
+            # dead-interval.
+            if 'hello_multiplier' in ospf['interface'][interface]:
+                del default_values['interface'][interface]['dead_interval']
+
+        ospf = config_dict_merge(default_values, ospf)
+        dict.update({'ospf' : ospf})
+
+    ospfv3 = conf.get_config_dict(['protocols', 'ospfv3'], key_mangling=('-', '_'), get_first_key=True)
+    if ospfv3:
+        ospfv3 = conf.merge_defaults(ospfv3, recursive=True)
+        dict.update({'ospfv3' : ospfv3})
+
+    rip = conf.get_config_dict(['protocols', 'rip'], key_mangling=('-', '_'), get_first_key=True)
+    if rip:
+        rip = conf.merge_defaults(rip, recursive=True)
+        dict.update({'rip' : rip})
+
+    ripng = conf.get_config_dict(['protocols', 'ripng'], key_mangling=('-', '_'), get_first_key=True)
+    if ripng:
+        ripng = conf.merge_defaults(ripng, recursive=True)
+        dict.update({'ripng' : ripng})
+
+    vrf = conf.get_config_dict(['vrf'], key_mangling=('-', '_'), get_first_key=True)
+    if vrf:
+        vrf = conf.merge_defaults(vrf, recursive=True)
+        dict.update({'vrf' : vrf})
+
+    return dict

@@ -415,12 +415,15 @@ def verify_common_route_maps(config):
     # route-map hypens '-' to underscores '_' and one could no longer distinguish
     # what should have been the "proper" route-map name, as foo-bar and foo_bar
     # are two entire different route-map instances!
+
+    print('TODO')
+
     for route_map in ['route-map', 'route_map']:
         if route_map not in config:
             continue
         tmp = config[route_map]
         # Check if the specified route-map exists, if not error out
-        if dict_search(f'policy.route-map.{tmp}', config) == None:
+        if dict_search(f'policy.route_map.{tmp}', config) == None:
             raise ConfigError(f'Specified route-map "{tmp}" does not exist!')
 
     if 'redistribute' in config:
@@ -434,7 +437,7 @@ def verify_route_map(route_map_name, config):
     recurring validation if a specified route-map exists!
     """
     # Check if the specified route-map exists, if not error out
-    if dict_search(f'policy.route-map.{route_map_name}', config) == None:
+    if dict_search(f'policy.route_map.{route_map_name}', config) == None:
         raise ConfigError(f'Specified route-map "{route_map_name}" does not exist!')
 
 def verify_prefix_list(prefix_list, config, version=''):
@@ -443,7 +446,7 @@ def verify_prefix_list(prefix_list, config, version=''):
     recurring validation if a specified prefix-list exists!
     """
     # Check if the specified prefix-list exists, if not error out
-    if dict_search(f'policy.prefix-list{version}.{prefix_list}', config) == None:
+    if dict_search(f'policy.prefix_list{version}.{prefix_list}', config) == None:
         raise ConfigError(f'Specified prefix-list{version} "{prefix_list}" does not exist!')
 
 def verify_access_list(access_list, config, version=''):
@@ -452,7 +455,7 @@ def verify_access_list(access_list, config, version=''):
     recurring validation if a specified prefix-list exists!
     """
     # Check if the specified ACL exists, if not error out
-    if dict_search(f'policy.access-list{version}.{access_list}', config) == None:
+    if dict_search(f'policy.access_list{version}.{access_list}', config) == None:
         raise ConfigError(f'Specified access-list{version} "{access_list}" does not exist!')
 
 def verify_pki_certificate(config: dict, cert_name: str, no_password_protected: bool=False):
